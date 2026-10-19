@@ -8,7 +8,7 @@ import librosa
 
 y, sr = common.load_stem("vocals", sr=22050)
 f = dict(np.load(common.WORK / "vocal_feats.npz")); ht = float(f["hop_s"])
-_d = json.loads((common.WORK / "align_debug.json").read_text())
+_d = json.loads((common.WORK / "align_debug.json").read_text(encoding="utf-8"))
 dbg, alt = _d["words"], _d["alt"]
 
 

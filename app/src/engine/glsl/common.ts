@@ -25,6 +25,17 @@ const vec3 C_EMBER = ${v3(LIN.ember)};
 const vec3 C_BLOOD = ${v3(LIN.blood)};
 const vec3 C_ACID = ${v3(LIN.acid)};
 
+// --- "I Only Cry In Sidechain" palette ---
+const vec3 C_BLACK = ${v3(LIN.black)};
+const vec3 C_PANEL = ${v3(LIN.panel)};
+const vec3 C_PAPER = ${v3(LIN.paper)};
+const vec3 C_MIST = ${v3(LIN.mist)};
+const vec3 C_CYAN = ${v3(LIN.cyan)};
+const vec3 C_SKY = ${v3(LIN.sky)};
+const vec3 C_BLUE = ${v3(LIN.blue)};
+const vec3 C_VIOLET = ${v3(LIN.violet)};
+const vec3 C_MAGENTA = ${v3(LIN.magenta)};
+
 /** Rotated-grid supersample offset k (0..3) within one pixel, in pixels. See SS_TAP (gl.ts). */
 vec2 rgss(int k) { return k == 0 ? vec2(0.125, -0.375) : k == 1 ? vec2(0.375, 0.125) : k == 2 ? vec2(-0.125, 0.375) : vec2(-0.375, -0.125); }
 
@@ -155,6 +166,15 @@ float engrave(vec2 uv, float darkness, float freq, float angle) {
 // ---- colour ----
 vec3 toSRGB(vec3 c) { return mix(12.92 * c, 1.055 * pow(max(c, 0.0), vec3(1.0 / 2.4)) - 0.055, step(0.0031308, c)); }
 vec3 toLinear(vec3 c) { return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(0.04045, c)); }
+/** The sidechain gradient, cyan (k=0) -> magenta (k=1). */
+vec3 gradient(float k) {
+  k = sat(k) * 4.0;
+  vec3 c = mix(C_CYAN, C_SKY, sat(k - 0.0));
+  c = mix(c, C_BLUE, sat(k - 1.0));
+  c = mix(c, C_VIOLET, sat(k - 2.0));
+  c = mix(c, C_MAGENTA, sat(k - 3.0));
+  return c;
+}
 /** Signal-orange heat ramp: 0 = ink, 0.5 = signal, 1 = white-hot. */
 vec3 heat(float x) {
   x = sat(x);

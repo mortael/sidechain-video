@@ -1,7 +1,7 @@
 [project]
 name = "analysis"
 version = "0.1.0"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.14"
 dependencies = [
     "audio-separator>=0.47.0",
     "audioread>=3.1.0",
@@ -9,7 +9,7 @@ dependencies = [
     "fonttools>=4.66.0",
     "librosa>=1.0.0",
     "matplotlib>=3.11.2",
-    "mlx-whisper>=0.4.3",
+    "faster-whisper>=1.0.3",
     "numpy>=2.5.3",
     "onnxruntime>=1.30.0",
     "scipy>=1.18.1",
@@ -17,3 +17,19 @@ dependencies = [
     "torch>=2.14.0",
     "torchaudio>=2.11.0",
 ]
+
+[tool.uv]
+# This fork only targets Windows; unrestricted the resolver also tries macOS
+# arm64/x86_64, where the pinned CUDA torch build below doesn't exist.
+environments = ["sys_platform == 'win32'"]
+
+# Windows PyPI wheels for torch/torchaudio are CPU-only; pull CUDA builds instead
+# so ctc_emissions.py / faster-whisper / demucs can use the GPU.
+[tool.uv.sources]
+torch = { index = "pytorch-cu" }
+torchaudio = { index = "pytorch-cu" }
+
+[[tool.uv.index]]
+name = "pytorch-cu"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true

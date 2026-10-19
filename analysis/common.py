@@ -1,4 +1,4 @@
-"""Shared paths / cache setup for the pdoom analysis scripts.
+"""Shared paths / cache setup for the analysis scripts.
 
 Import this module FIRST (before torch / huggingface / mlx imports) so that all
 model downloads land in analysis/.cache/.
@@ -16,8 +16,8 @@ for var, sub in [("TORCH_HOME", "torch"), ("HF_HOME", "hf"), ("HF_HUB_CACHE", "h
     os.environ.setdefault(var, str(CACHE / sub))
     (CACHE / sub).mkdir(parents=True, exist_ok=True)
 
-AUDIO = PROJECT / "audio" / "pdoom.mp3"
-STEMS = ROOT / "stems" / "htdemucs_ft" / "pdoom"
+AUDIO = PROJECT / "audio" / "sidechain.mp3"
+STEMS = ROOT / "stems" / "htdemucs_ft" / "sidechain"
 LYRICS_SRC = PROJECT / "lyrics" / "lyrics.src.js"
 DATA = PROJECT / "data"
 QA = ROOT / "qa"
@@ -35,13 +35,12 @@ def load_lyrics_src():
     return [tuple(x) for x in json.loads(body)]
 
 
-# The Demucs stems were rendered from an mp3 decode that did NOT trim the LAME
-# encoder delay (1105 samples @ 48 kHz = 23.0 ms). The gapless decode of the mp3
-# (ffmpeg / libsndfile / browsers) is our time reference, so stems are shifted
-# earlier by 1015 samples @ 44.1 kHz (measured by cross-correlation, constant
-# over the whole song).
-STEM_OFFSET_SAMPLES = 1015
-STEM_OFFSET_SEC = STEM_OFFSET_SAMPLES / 44100
+# Demucs was run on a WAV decoded with ffmpeg (same gapless decode as load_mix /
+# the browser), not on the raw mp3, so there is no encoder-delay mismatch to
+# correct for this song (contrast the original pdoom pipeline, which fed Demucs
+# the mp3 directly and had to measure and subtract a 1015-sample offset).
+STEM_OFFSET_SAMPLES = 0
+STEM_OFFSET_SEC = 0.0
 
 
 def load_stem(name, sr=None, mono=True):
